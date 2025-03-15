@@ -1,0 +1,77 @@
+﻿@model Soccer.Models.IndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form method="get">
+    <div>
+        <label>Position: </label>
+        <input name="position" value="@Model.FilterViewModel.SelectedPosition" />
+        <label>Team: </label>
+        <select name="team" asp-items="Model.FilterViewModel.Teams"></select>
+        <input type="submit" value="Filter" />
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Name</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.AgeSort)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Age</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.PositionSort)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Position</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.TeamSort)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Team</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Players)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Position)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Team!.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-position="@(Model.FilterViewModel.SelectedPosition)"
+           page-url-team="@(Model.FilterViewModel.SelectedTeam)"
+           page-url-sortorder="@(Model.SortViewModel.Current)"></page-link>
