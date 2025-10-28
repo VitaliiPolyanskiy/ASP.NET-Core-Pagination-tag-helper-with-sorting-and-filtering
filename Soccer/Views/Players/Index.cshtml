@@ -5,8 +5,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
-
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -54,7 +52,7 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Age)
+                    @(DateTime.Now.Year - item.BirthYear)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Position)
