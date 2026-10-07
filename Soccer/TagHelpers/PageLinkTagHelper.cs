@@ -25,7 +25,7 @@ public class PageLinkTagHelper(IUrlHelperFactory urlHelperFactory) : TagHelper
             throw new ArgumentNullException(nameof(PageModel), "Модель сторінки не встановлена");
 
         IUrlHelper urlHelper = urlHelperFactory.GetUrlHelper(ViewContext);
-        output.TagName = "nav"; // Використання семантичного тегу nav
+        output.TagName = "nav"; 
 
         TagBuilder tag = new("ul");
         tag.AddCssClass("pagination justify-content-center mt-4");
