@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Soccer.Models
+namespace Soccer.Models;
+
+public class FilterViewModel
 {
-    public class FilterViewModel
+    public SelectList Teams { get; }            // список команд
+    public int SelectedTeam { get; }            // обрана команда
+    public string? SelectedPosition { get; }    // введена позиція
+
+    public FilterViewModel(List<Team> teams, int team, string? position)
     {
-        public FilterViewModel(List<Teams> teams, int team, string position)
-        {
-            // устанавливаем начальный элемент, который позволит выбрать всех
-            teams.Insert(0, new Teams { Name = "All", Id = 0 });
-            Teams = new SelectList(teams, "Id", "Name", team);
-            SelectedTeam = team;
-            SelectedPosition = position;
-        }
-        public SelectList Teams { get; } // список клубов
-        public int SelectedTeam { get; } // выбранный клуб
-        public string SelectedPosition { get; } // введенная позиция
+        // Встановлюємо початковий елемент, який дозволить обрати всіх
+        teams.Insert(0, new Team { Name = "Всі", Id = 0, Coach = "Немає тренера" });
+        Teams = new SelectList(teams, "Id", "Name", team);
+        SelectedTeam = team;
+        SelectedPosition = position;
     }
 }

@@ -1,20 +1,13 @@
-﻿namespace Soccer.Models
+﻿namespace Soccer.Models;
+
+public class IndexViewModel(
+    IEnumerable<Player> players,
+    PageViewModel pageViewModel,
+    FilterViewModel filterViewModel,
+    SortViewModel sortViewModel)
 {
-    public class IndexViewModel
-    {
-        public IEnumerable<Players> Players { get; set; }
-        public PageViewModel PageViewModel { get; }
-        public FilterViewModel FilterViewModel { get; }
-        public SortViewModel SortViewModel { get; }
-
-        public IndexViewModel(IEnumerable<Players> players, PageViewModel pageViewModel,
-            FilterViewModel filterViewModel, SortViewModel sortViewModel)
-        {
-            Players = players;
-            PageViewModel = pageViewModel;
-            FilterViewModel = filterViewModel;
-            SortViewModel = sortViewModel;
-        }
-    }
+    public IEnumerable<Player> Players { get; } = players;
+    public PageViewModel PageViewModel { get; } = pageViewModel;
+    public FilterViewModel FilterViewModel { get; } = filterViewModel;
+    public SortViewModel SortViewModel { get; } = sortViewModel;
 }
-

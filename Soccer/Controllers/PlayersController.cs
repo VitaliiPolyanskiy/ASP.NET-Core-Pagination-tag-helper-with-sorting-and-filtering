@@ -6,23 +6,16 @@ using Soccer.Models;
 
 namespace Soccer.Controllers
 {
-    public class PlayersController : Controller
+    public class PlayersController(SoccerContext context) : Controller
     {
-        private readonly SoccerContext _context;
-
-        public PlayersController(SoccerContext context)
-        {
-            _context = context;
-        }
-
         // GET: Players
         public async Task<IActionResult> Index(string position, int team = 0, int page = 1,
             SortState sortOrder = SortState.NameAsc)
         {
             int pageSize = 5;
 
-            //фильтрация
-            IQueryable<Players> players = _context.Players.Include(x => x.Team);
+            // Фільтрація
+            IQueryable<Player> players = context.Players.Include(x => x.Team);
 
             if (team != 0)
             {
@@ -33,12 +26,13 @@ namespace Soccer.Controllers
                 players = players.Where(p => p.Position == position);
             }
 
-            // сортировка
+            // Сортування
+            var currentYear = DateTime.Now.Year;
             players = sortOrder switch
             {
                 SortState.NameDesc => players.OrderByDescending(s => s.Name),
-                SortState.AgeAsc => players.OrderBy(s => DateTime.Now.Year - s.BirthYear),
-                SortState.AgeDesc => players.OrderByDescending(s => DateTime.Now.Year - s.BirthYear),
+                SortState.AgeAsc => players.OrderBy(s => currentYear - s.BirthYear),
+                SortState.AgeDesc => players.OrderByDescending(s => currentYear - s.BirthYear),
                 SortState.PositionAsc => players.OrderBy(s => s.Position),
                 SortState.PositionDesc => players.OrderByDescending(s => s.Position),
                 SortState.TeamAsc => players.OrderBy(s => s.Team!.Name),
@@ -46,29 +40,30 @@ namespace Soccer.Controllers
                 _ => players.OrderBy(s => s.Name),
             };
 
-            // пагинация
+            // Пагінація
             var count = await players.CountAsync();
             var items = await players.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            // формируем модель представления
-            IndexViewModel viewModel = new IndexViewModel(
+            // Формуємо модель представлення
+            var viewModel = new IndexViewModel(
                 items,
                 new PageViewModel(count, page, pageSize),
-                new FilterViewModel(_context.Teams.ToList(), team, position),
+                new FilterViewModel(await context.Teams.ToListAsync(), team, position),
                 new SortViewModel(sortOrder)
             );
+
             return View(viewModel);
         }
 
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Players == null)
+            if (id == null || context.Players == null)
             {
                 return NotFound();
             }
 
-            var players = await _context.Players
+            var players = await context.Players
                 .Include(p => p.Team)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (players == null)
@@ -82,48 +77,48 @@ namespace Soccer.Controllers
         // GET: Players/Create
         public IActionResult Create()
         {
-            ViewData["TeamId"] = new SelectList(_context.Teams, "Id", "Name");
+            ViewData["TeamId"] = new SelectList(context.Teams, "Id", "Name");
             return View();
         }
 
         // POST: Players/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,BirthYear,Position,TeamId")] Players players)
+        public async Task<IActionResult> Create([Bind("Id,Name,BirthYear,Position,TeamId")] Player players)
         {
             if (DateTime.Now.Year - players.BirthYear <= 0)
                 ModelState.AddModelError("Age", "Возраст должен быть больше нуля");
             if (ModelState.IsValid)
             {
-                _context.Add(players);
-                await _context.SaveChangesAsync();
+                context.Add(players);
+                await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TeamId"] = new SelectList(_context.Teams, "Id", "Name");
+            ViewData["TeamId"] = new SelectList(context.Teams, "Id", "Name");
             return View(players);
         }
 
         // GET: Players/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Players == null)
+            if (id == null || context.Players == null)
             {
                 return NotFound();
             }
 
-            var players = await _context.Players.FindAsync(id);
+            var players = await context.Players.FindAsync(id);
             if (players == null)
             {
                 return NotFound();
             }
-            ViewData["TeamId"] = new SelectList(_context.Teams, "Id", "Name", players.TeamId);
+            ViewData["TeamId"] = new SelectList(context.Teams, "Id", "Name", players.TeamId);
             return View(players);
         }
 
         // POST: Players/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BirthYear,Position,TeamId")] Players players)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,BirthYear,Position,TeamId")] Player players)
         {
             if (id != players.Id)
             {
@@ -135,8 +130,8 @@ namespace Soccer.Controllers
             {
                 try
                 {
-                    _context.Update(players);
-                    await _context.SaveChangesAsync();
+                    context.Update(players);
+                    await context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -151,19 +146,19 @@ namespace Soccer.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TeamId"] = new SelectList(_context.Teams, "Id", "Name", players.TeamId);
+            ViewData["TeamId"] = new SelectList(context.Teams, "Id", "Name", players.TeamId);
             return View(players);
         }
 
         // GET: Players/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Players == null)
+            if (id == null || context.Players == null)
             {
                 return NotFound();
             }
 
-            var players = await _context.Players
+            var players = await context.Players
                 .Include(p => p.Team)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (players == null)
@@ -179,23 +174,23 @@ namespace Soccer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Players == null)
+            if (context.Players == null)
             {
                 return Problem("Entity set 'SoccerContext.Players'  is null.");
             }
-            var players = await _context.Players.FindAsync(id);
+            var players = await context.Players.FindAsync(id);
             if (players != null)
             {
-                _context.Players.Remove(players);
+                context.Players.Remove(players);
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PlayersExists(int id)
         {
-            return (_context.Players?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (context.Players?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

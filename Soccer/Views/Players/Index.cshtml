@@ -1,75 +1,110 @@
 ﻿@model Soccer.Models.IndexViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Список гравців";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0">Список гравців</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Додати нового гравця
+    </a>
+</div>
 
-<form method="get">
-    <div>
-        <label>Position: </label>
-        <input name="position" value="@Model.FilterViewModel.SelectedPosition" />
-        <label>Team: </label>
-        <select name="team" asp-items="Model.FilterViewModel.Teams"></select>
-        <input type="submit" value="Filter" />
+<!-- Сучасна форма фільтрації на Bootstrap 5 -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="col-form-label fw-bold">Позиція:</label>
+            </div>
+            <div class="col-sm-3">
+                <input name="position" value="@Model.FilterViewModel.SelectedPosition" class="form-control" placeholder="Введіть позицію..." />
+            </div>
+            <div class="col-auto">
+                <label class="col-form-label fw-bold">Команда:</label>
+            </div>
+            <div class="col-sm-3">
+                <select name="team" asp-items="Model.FilterViewModel.Teams" class="form-select"></select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="bi bi-funnel"></i> Фільтрувати
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Скинути
+                </a>
+            </div>
+        </form>
     </div>
-</form>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                <a asp-action="Index"
-                   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
-                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
-                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Name</a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.AgeSort)"
-                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
-                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Age</a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.PositionSort)"
-                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
-                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Position</a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.TeamSort)"
-                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
-                   asp-route-team="@(Model.FilterViewModel.SelectedTeam)">Team</a>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Players)
-        {
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped align-middle border">
+        <thead class="table-light">
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @(DateTime.Now.Year - item.BirthYear)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Position)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Team!.Name)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                <th>
+                    <a class="text-decoration-none text-dark fw-bold d-block" asp-action="Index"
+                       asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                       asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                       asp-route-team="@(Model.FilterViewModel.SelectedTeam)">
+                        Ім'я <i class="bi bi-arrow-down-up ms-1 text-muted" style="font-size: 0.8em;"></i>
+                    </a>
+                </th>
+                <th>
+                    <a class="text-decoration-none text-dark fw-bold d-block" asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.AgeSort)"
+                       asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                       asp-route-team="@(Model.FilterViewModel.SelectedTeam)">
+                        Вік <i class="bi bi-arrow-down-up ms-1 text-muted" style="font-size: 0.8em;"></i>
+                    </a>
+                </th>
+                <th>
+                    <a class="text-decoration-none text-dark fw-bold d-block" asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.PositionSort)"
+                       asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                       asp-route-team="@(Model.FilterViewModel.SelectedTeam)">
+                        Позиція <i class="bi bi-arrow-down-up ms-1 text-muted" style="font-size: 0.8em;"></i>
+                    </a>
+                </th>
+                <th>
+                    <a class="text-decoration-none text-dark fw-bold d-block" asp-action="Index" asp-route-sortOrder="@(Model.SortViewModel.TeamSort)"
+                       asp-route-position="@(Model.FilterViewModel.SelectedPosition)"
+                       asp-route-team="@(Model.FilterViewModel.SelectedTeam)">
+                        Команда <i class="bi bi-arrow-down-up ms-1 text-muted" style="font-size: 0.8em;"></i>
+                    </a>
+                </th>
+                <th class="text-end text-dark fw-bold">Дії</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Players)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@(DateTime.Now.Year - item.BirthYear)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Position)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Team!.Name)</td>
+                    <td class="text-end">
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary" title="Редагувати">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Деталі">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Видалити">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
 <page-link page-model="Model.PageViewModel" page-action="Index"
            page-url-position="@(Model.FilterViewModel.SelectedPosition)"
            page-url-team="@(Model.FilterViewModel.SelectedTeam)"
-           page-url-sortorder="@(Model.SortViewModel.Current)"></page-link>
+           page-url-sortorder="@(Model.SortViewModel.Current)">
+</page-link>
